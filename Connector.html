@@ -1,0 +1,110 @@
+<script>
+  let socket;
+
+  const fetchNui = (url, data) => {
+    return fetch(`https://${GetParentResourceName()}/${url}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify(data),
+    });
+  };
+
+  const connectWebSocket = (channelName, channelPassword, username) => {
+    socket = new WebSocket("ws://localhost:3005");
+    socket.onopen = () => {
+      console.log("WebSocket Connected");
+      socket.send({
+        method: "joinChannel",
+        data: {
+          channel: channelName,
+          password: channelPassword,
+          username: username,
+        },
+      });
+      fetchNui("connected", {});
+    };
+
+    socket.onclose = (event) => {
+      console.log("WebSocket Disconnected!", event.code);
+      switch (event.code) {
+        case 1000:
+          fetchNui("disconnected", {});
+          console.log("Reconnecting...");
+          setTimeout(
+            connectWebSocket(channelName, channelPassword, username),
+            2000
+          );
+          break;
+        case 1005:
+          console.log("Reconnecting...");
+          setTimeout(
+            connectWebSocket(channelName, channelPassword, username),
+            2000
+          );
+          break;
+
+        case 1006:
+          console.log("Reconnecting...");
+          setTimeout(
+            connectWebSocket(channelName, channelPassword, username),
+            2000
+          );
+          break;
+      }
+    };
+
+    socket.onmessage = (event) => {
+      console.info("WebSocket Message:", event.data);
+      const voiceData = ({ data, method } = JSON.parse(event.data));
+
+      switch (data.method) {
+        case "talking":
+          console.log(
+            voiceData.data.name,
+            "is talking: ",
+            voiceData.data.status
+          );
+          break;
+
+        case "Connected":
+          socket.send({
+            method: "joinChannel",
+            data: {
+              channel: channelName,
+              password: channelPassword,
+              username: username,
+            },
+          });
+          break;
+
+        case "success":
+          break;
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.log("WebSocket Error:", error);
+    };
+  };
+
+  // add an event listener, to listen to NUI Events
+  window.addEventListener("message", function (event) {
+    switch (event.data.action) {
+      case "send": {
+        if (typeof event.data.data == "string") socket.send(event.data.data);
+        socket.send(JSON.stringify(event.data.data));
+        break;
+      }
+
+      case "init": {
+        connectWebSocket(
+          event.data.channelName,
+          event.data.channelPassword,
+          event.data.username
+        );
+      }
+    }
+  });
+</script>
