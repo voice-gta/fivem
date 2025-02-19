@@ -1,5 +1,5 @@
 local IsDrawingRangeCircle = false
-AddEventHandler('gta5voice:VoiceRangeChanged', function(range, index)
+AddEventHandler('voice:VoiceRangeChanged', function(range, index)
   IsDrawingRangeCircle = false;
   Wait(0);
   local Reset = true;

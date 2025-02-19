@@ -16,7 +16,6 @@ local GetPlayerServerId = GetPlayerServerId;
 local GetPlayerFromServerId = GetPlayerFromServerId;
 
 -- Lua Globals
-local math_pi = math.pi;
 local math_cos = math.cos;
 local math_sin = math.sin;
 local math_floor = math.floor;
@@ -24,15 +23,13 @@ local function math_round(value)
   return math_floor(value + 0.5);
 end
 local table_insert = table.insert;
-local table_concat = table.concat;
 local pairs = pairs;
 
 -- Variables
 local Config = nil;
 local UserName = '';
 local UserId = GetPlayerServerId(PlayerId());
-local LastURL = '';
-local BASE_URL = 'http://localhost:15555/custom_players2/';
+local loop = false;
 
 -- Register Events
 -- Player Events
@@ -82,30 +79,47 @@ AddEventHandler('voice:PlayerLoaded', function(Data)
 
   -- initiate the main thread
   CreateThread(function()
-    while true do
+    SendNUIMessage({
+      action = 'init',
+      channelName = Config.ChannelName,
+      channelPassword = Config.ChannelPassword,
+      username = UserName
+    });
+  end);
+end);
+
+--[[
+Ardi mach hier den Code einfach sauberer sowie in onVoiceTick bitte
+LG
+Dein
+SMJ 1337 - wake up...
+]]
+
+RegisterNuiCallback('connected', function()
+  loop = true;
+
+  CreateThread(function()
+    while loop do
       -- trigger main voice function
       OnVoiceTick();
       -- tick all 200ms
       Wait(200);
     end
-  end);
+  end)
+end);
+
+RegisterNuiCallback('disconnected', function()
+  loop = false;
 end);
 
 -- Functions
-function voice.ChangeURL(URL)
-  SendNUIMessage({
-    action = 'SetFrameUrl',
-    url = URL
-  });
-end
-
 function OnVoiceTick()
   -- define player position, ped, etc
   -- used to compare distance, etc
   local Player = PlayerPedId();
   local PlayerPos = GetEntityCoords(Player);
-  local PlayerHeading = GetEntityHeading(Player);
-  local PlayerRotation = math_pi / 180 * (PlayerHeading * -1);
+  local Rotation = GetGameplayCamRot(2).z;
+
   -- init the PlayerNames table, were all voice clients get stored
   local PlayerNames = {};
   -- define current client pool data as MyPool
@@ -136,7 +150,7 @@ function OnVoiceTick()
 
             -- if the distance is greater or equals 5 then modify the volume to be quieter
             if Distance >= 5 then
-              VolumeModifier = (Distance * -5 / 10);
+              VolumeModifier = (Distance * 35 / 10);
             end
 
             -- if the volume somehow exceeds 0, reset it to 0
@@ -151,11 +165,8 @@ function OnVoiceTick()
             };
 
             -- do some math sh*t to define where the audio is coming from, etc
-            local x = SubPos.X * math_cos(PlayerRotation) - SubPos.Y * math_sin(PlayerRotation);
-            local y = SubPos.X * math_cos(PlayerRotation) + SubPos.Y * math_sin(PlayerRotation);
-
-            x = x * 10 / TargetVoiceRange;
-            y = y * 10 / TargetVoiceRange;
+            local x = SubPos.X * math_cos(Rotation) - SubPos.Y * math_sin(Rotation) * 10 / TargetVoiceRange;
+            local y = SubPos.X * math_cos(Rotation) + SubPos.Y * math_sin(Rotation) * 10 / TargetVoiceRange;
 
             -- define the player "Name", for the url to use as a parameter
             local Name = PoolData.name ..
@@ -164,7 +175,15 @@ function OnVoiceTick()
                 '~' .. (math_round(y * 1000) / 1000) .. '~0~' .. (math_round(VolumeModifier * 1000) / 1000);
 
             -- insert it to the PlayerNames table, which we created before
-            table_insert(PlayerNames, Name);
+            table_insert(PlayerNames, {
+              name = PoolData.name,
+              x = x,
+              y = y,
+              z = 0,
+              distance = Distance,
+              volumeRange = TargetVoiceRange,
+              volumeModifier = VolumeModifier
+            });
           else
             -- if the player isn't anywhere near us, or we aren't able to hear him,
             -- because our distance exceeds his voice range,
@@ -174,7 +193,16 @@ function OnVoiceTick()
                 (PoolData.radioId and PoolData.radioId == MyPool.radioId and PoolData.radioActive)
             then
               -- if so then insert him to the PlayerNames table
-              table_insert(PlayerNames, PoolData.name .. '~10~0~0~3');
+              table_insert(PlayerNames,
+                {
+                  name = PoolData.name,
+                  x = 10,
+                  y = 0,
+                  z = 0,
+                  distance = 0,
+                  volumeRange = 5,
+                  volumeModifier = 3
+                });
             end
           end
         end
@@ -182,16 +210,13 @@ function OnVoiceTick()
     end
   end
 
-  -- define the "new iFrame url"
-  local URL = BASE_URL ..
-      Config.ChannelName .. '/' .. Config.ChannelPassword .. '/' .. UserName .. '/' .. table_concat(PlayerNames, ';');
-
-  -- if the "new iFrame url" doesnt match the old one, then change it
-  if LastURL ~= URL then
-    LastURL = URL;
-
-    voice.ChangeURL(URL);
-  end
+  SendNUIMessage({
+    action = 'send',
+    data = {
+      method = 'updateTargetPositions',
+      data = PlayerNames
+    }
+  });
 end
 
 -- Export Data

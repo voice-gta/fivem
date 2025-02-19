@@ -93,7 +93,6 @@
   window.addEventListener("message", function (event) {
     switch (event.data.action) {
       case "send": {
-        if (typeof event.data.data == "string") socket.send(event.data.data);
         socket.send(JSON.stringify(event.data.data));
         break;
       }

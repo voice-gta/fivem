@@ -1,4 +1,4 @@
-local convar = GetConvar('gta5voice_debug', 'no');
+local convar = GetConvar('voice_debug', 'no');
 
 if convar == '\'yes\'' or convar == 'yes' then
   RegisterCommand('debug', function(s, args)
@@ -9,15 +9,15 @@ if convar == '\'yes\'' or convar == 'yes' then
 
     if action == 'radio' then
       if value == 'join' then
-        exports.gta5voice:AddPlayerToRadio(s, value2);
+        exports.voice:AddPlayerToRadio(s, value2);
       else
-        exports.gta5voice:RemovePlayerToRadio(s, value2);
+        exports.voice:RemovePlayerToRadio(s, value2);
       end
     elseif action == 'call' then
       if value == 'join' then
-        exports.gta5voice:AddPlayerToCall(s, value2);
+        exports.voice:AddPlayerToCall(s, value2);
       else
-        exports.gta5voice:RemovePlayerToCall(s, value2);
+        exports.voice:RemovePlayerToCall(s, value2);
       end
     end
 

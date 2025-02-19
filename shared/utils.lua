@@ -1,5 +1,5 @@
 function GetTableIndexBySource(source, returnData)
-  for _, PoolData in pairs(gta5voice.PlayerPool) do
+  for _, PoolData in pairs(voice.PlayerPool) do
     if PoolData.source == source then
       if returnData then
         return _, PoolData;
