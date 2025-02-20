@@ -15,14 +15,14 @@
     socket = new WebSocket("ws://localhost:3005");
     socket.onopen = () => {
       console.log("WebSocket Connected");
-      socket.send({
+      socket.send(JSON.stringify({
         method: "joinChannel",
         data: {
           channel: channelName,
           password: channelPassword,
           username: username,
         },
-      });
+      }));
       fetchNui("connected", {});
     };
 
@@ -59,7 +59,7 @@
       console.info("WebSocket Message:", event.data);
       const voiceData = ({ data, method } = JSON.parse(event.data));
 
-      switch (data.method) {
+      switch (voiceData.method) {
         case "talking":
           console.log(
             voiceData.data.name,
@@ -69,14 +69,14 @@
           break;
 
         case "Connected":
-          socket.send({
+          socket.send(JSON.stringify({
             method: "joinChannel",
             data: {
               channel: channelName,
               password: channelPassword,
               username: username,
             },
-          });
+          }));
           break;
 
         case "success":
