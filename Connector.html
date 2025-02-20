@@ -11,46 +11,41 @@
     });
   };
 
+  const reconnectWebSocket = (channelName, channelPassword, username) => {
+    console.log("Reconnecting...");
+    setTimeout(connectWebSocket(channelName, channelPassword, username), 2000);
+  };
+
   const connectWebSocket = (channelName, channelPassword, username) => {
     socket = new WebSocket("ws://localhost:3005");
     socket.onopen = () => {
       console.log("WebSocket Connected");
-      socket.send(JSON.stringify({
-        method: "joinChannel",
-        data: {
-          channel: channelName,
-          password: channelPassword,
-          username: username,
-        },
-      }));
+      socket.send(
+        JSON.stringify({
+          method: "joinChannel",
+          data: {
+            channel: channelName,
+            password: channelPassword,
+            username: username,
+          },
+        })
+      );
       fetchNui("connected", {});
     };
 
     socket.onclose = (event) => {
-      console.log("WebSocket Disconnected!", event.code);
+      console.log("WebSocket Disconnected, Code:", event.code);
       switch (event.code) {
         case 1000:
           fetchNui("disconnected", {});
-          console.log("Reconnecting...");
-          setTimeout(
-            connectWebSocket(channelName, channelPassword, username),
-            2000
-          );
+          reconnectWebSocket(channelName, channelPassword, username);
           break;
         case 1005:
-          console.log("Reconnecting...");
-          setTimeout(
-            connectWebSocket(channelName, channelPassword, username),
-            2000
-          );
+          reconnectWebSocket(channelName, channelPassword, username);
           break;
 
         case 1006:
-          console.log("Reconnecting...");
-          setTimeout(
-            connectWebSocket(channelName, channelPassword, username),
-            2000
-          );
+          reconnectWebSocket(channelName, channelPassword, username);
           break;
       }
     };
@@ -69,14 +64,16 @@
           break;
 
         case "Connected":
-          socket.send(JSON.stringify({
-            method: "joinChannel",
-            data: {
-              channel: channelName,
-              password: channelPassword,
-              username: username,
-            },
-          }));
+          socket.send(
+            JSON.stringify({
+              method: "joinChannel",
+              data: {
+                channel: channelName,
+                password: channelPassword,
+                username: username,
+              },
+            })
+          );
           break;
 
         case "success":
@@ -93,7 +90,11 @@
   window.addEventListener("message", function (event) {
     switch (event.data.action) {
       case "send": {
-        socket.send(JSON.stringify(event.data.data));
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify(event.data.data));
+        } else {
+          console.log("Socket is not connected");
+        }
         break;
       }
 
