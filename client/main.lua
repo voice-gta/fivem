@@ -18,10 +18,6 @@ local GetPlayerFromServerId = GetPlayerFromServerId;
 -- Lua Globals
 local math_cos = math.cos;
 local math_sin = math.sin;
-local math_floor = math.floor;
-local function math_round(value)
-  return math_floor(value + 0.5);
-end
 local table_insert = table.insert;
 local pairs = pairs;
 
@@ -105,7 +101,7 @@ RegisterNuiCallback('connected', function()
       -- tick all 200ms
       Wait(200);
     end
-  end)
+  end);
 end);
 
 RegisterNuiCallback('disconnected', function()
@@ -167,12 +163,6 @@ function OnVoiceTick()
             -- do some math sh*t to define where the audio is coming from, etc
             local x = SubPos.X * math_cos(Rotation) - SubPos.Y * math_sin(Rotation) * 10 / TargetVoiceRange;
             local y = SubPos.X * math_cos(Rotation) + SubPos.Y * math_sin(Rotation) * 10 / TargetVoiceRange;
-
-            -- define the player "Name", for the url to use as a parameter
-            local Name = PoolData.name ..
-                '~' ..
-                (math_round(x * 1000) / 1000) ..
-                '~' .. (math_round(y * 1000) / 1000) .. '~0~' .. (math_round(VolumeModifier * 1000) / 1000);
 
             -- insert it to the PlayerNames table, which we created before
             table_insert(PlayerNames, {
