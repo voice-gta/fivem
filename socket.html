@@ -1,0 +1,161 @@
+<script>
+  if (!('WebSocket' in window)) {
+    throw new Error('Websockets are not supported');
+  }
+
+  const RESOURCE_NAME = 'GetParentResourceName' in window ? GetParentResourceName() : 'voice';
+  const HEADERS = {
+    'Content-Type': 'application/json; charset=UTF-8',
+  };
+  const BASE_URL = `https://${RESOURCE_NAME}`;
+
+  let socket, debug = false;
+
+  /**
+   * Log a message to the console
+   * @param {string} message - The message to log
+   */
+  console.debug = function (...args) {
+    if (!debug) return;
+
+    console.log('^6[Voice]:', ...args, '^0');
+  };
+
+  /**
+   * Fetch a NUI message
+   * @param {string} url - The NUI endpoint
+   * @param {any} data - The data to send
+   * @returns {Promise<any>} The response from the NUI message
+   */
+  async function fetchNui(url, data) {
+    console.debug('fetchNui', url, data);
+
+    const resp = await fetch(`${BASE_URL}/${url}`, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify(data),
+    });
+
+    if (!resp.ok) {
+      return null;
+    }
+
+    try {
+      return await resp.json();
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Connect to the WebSocket
+   * @param {string} channelName - The channel name
+   * @param {string} channelPassword - The channel password
+   * @param {string} username - The username
+   */
+  function connectWebSocket(channelName, channelPassword, username) {
+    socket = new WebSocket('ws://localhost:3005');
+
+    socket.onopen = () => {
+      console.debug('WebSocket Connected');
+
+      socket.send(
+        JSON.stringify({
+          method: 'joinChannel',
+          data: {
+            channel: channelName,
+            password: channelPassword,
+            username: username,
+          },
+        })
+      );
+
+      fetchNui('Connected');
+    };
+
+    socket.onclose = (event) => {
+      console.debug('WebSocket Disconnected, Code:', event.code);
+
+      switch (event.code) {
+        case 1000:
+          fetchNui('Disconnected');
+
+        case 1005:
+        case 1006:
+          reconnectWebSocket(channelName, channelPassword, username);
+          break;
+      }
+    };
+
+    socket.onmessage = (event) => {
+      console.debug('WebSocket Message:', event.data);
+
+      const voiceData = ({ data, method } = JSON.parse(event.data));
+
+      switch (voiceData.method) {
+        case 'talking':
+          fetchNui('Talking', {
+            state: voiceData.data.status
+          });
+          break;
+
+        case 'Connected': // Connected to the server
+          socket.send(
+            JSON.stringify({
+              method: 'joinChannel',
+              data: {
+                channel: channelName,
+                password: channelPassword,
+                username: username,
+              },
+            })
+          );
+          break;
+
+        // case 'success': //Successfully joined the voice channel
+        //   break;
+      }
+    };
+
+    socket.onerror = (error) => {
+      console.debug('WebSocket Error:', error);
+    };
+  }
+
+  /**
+   * Reconnect the WebSocket
+   * @param {string} channelName - The channel name
+   * @param {string} channelPassword - The channel password
+   * @param {string} username - The username
+   */
+  function reconnectWebSocket(channelName, channelPassword, username) {
+    console.debug('Reconnecting...');
+
+    setTimeout(connectWebSocket.bind(null, channelName, channelPassword, username), 2000);
+  }
+
+  // add an event listener, to listen to NUI Events
+  window.addEventListener('message', function (event) {
+    switch (event.data.action) {
+      case 'send': {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          return socket.send(JSON.stringify(event.data.data));
+        }
+
+        console.debug('Socket is not connected');
+        break;
+      }
+
+      case 'init': {
+        debug = !!event.data.debug;
+
+        connectWebSocket(
+          event.data.channelName,
+          event.data.channelPassword,
+          event.data.username
+        );
+        break;
+      }
+    }
+  });
+</script>
