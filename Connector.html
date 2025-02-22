@@ -62,7 +62,7 @@
           });
           break;
 
-        case "Connected":
+        case "Connected": // Connected to the server
           socket.send(
             JSON.stringify({
               method: "joinChannel",
@@ -75,7 +75,7 @@
           );
           break;
 
-        case "success":
+        case "success": //Successfully joined the voice channel
           break;
       }
     };
