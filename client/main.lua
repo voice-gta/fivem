@@ -77,14 +77,13 @@ AddEventHandler('voice:PlayerLoaded', function(Data)
   UserName = Config.UserPrefix .. UserId;
 
   -- initiate the main thread
-  CreateThread(function()
-    SendNUIMessage({
-      action = 'init',
-      channelName = Config.ChannelName,
-      channelPassword = Config.ChannelPassword,
-      username = UserName
-    });
-  end);
+  SendNUIMessage({
+    action = 'init',
+    debug = true,
+    channelName = Config.ChannelName,
+    channelPassword = Config.ChannelPassword,
+    username = UserName
+  });
 end);
 
 --[[
@@ -94,29 +93,43 @@ Dein
 SMJ 1337 - wake up...
 ]]
 
-RegisterNuiCallback('connected', function()
+RegisterNUICallback('Connected', function(_, resp)
   loop = true;
 
-  CreateThread(function()
-    while loop do
-      -- trigger main voice function
-      OnVoiceTick();
-      -- tick all 200ms
-      Wait(200);
-    end
-  end);
-end);
-
-RegisterNuiCallback('talking', function(data)
-  if data.talkingState then
-    PlayFacialAnim(Player, "mic_chatter", "mp_facial");
-  else
-    PlayFacialAnim(Player, "mood_normal_1", IsPedMale(Player) and "facials@gen_male@variations@normal" or "facials@gen_female@variations@normal");
+  while loop do
+    -- trigger main voice function
+    OnVoiceTick();
+    Citizen.Wait(1000);
   end
+
+  resp('OK');
 end);
 
-RegisterNuiCallback('disconnected', function()
+RegisterNUICallback('Talking', function(data, resp)
+  -- TODO: change this to player data
+  local ped = PlayerPedId();
+
+  SetPlayerTalkingOverride(PlayerId(), data.state);
+
+  if data.state then
+    PlayFacialAnim(ped, 'mic_chatter', 'mp_facial');
+  else
+    local animName = 'facials@gen_female@variations@normal';
+
+    if IsPedMale(ped) then
+      animName = 'facials@gen_male@variations@normal';
+    end
+
+    PlayFacialAnim(ped, 'mood_normal_1', animName);
+  end
+
+  resp('OK');
+end);
+
+RegisterNUICallback('Disconnected', function(_, resp)
   loop = false;
+
+  resp('OK');
 end);
 
 -- Functions

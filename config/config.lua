@@ -1,5 +1,5 @@
 Config = {
-  ChannelName = 'Voice',
+  ChannelName = 'Ingame',
   ChannelPassword = '123',
   UserPrefix = '00',
   Ranges = {

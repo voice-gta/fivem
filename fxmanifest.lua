@@ -6,8 +6,8 @@ author 'SMJ-1337 & ardelan869'
 description 'still thinking...'
 version '1.0'
 
-ui_page 'Connector.html'
-file 'Connector.html'
+ui_page 'socket.html'
+file 'socket.html'
 
 shared_script 'shared/**/*'
 
