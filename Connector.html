@@ -18,6 +18,7 @@
 
   const connectWebSocket = (channelName, channelPassword, username) => {
     socket = new WebSocket("ws://localhost:3005");
+
     socket.onopen = () => {
       console.log("WebSocket Connected");
       socket.send(
@@ -56,11 +57,9 @@
 
       switch (voiceData.method) {
         case "talking":
-          console.log(
-            voiceData.data.name,
-            "is talking: ",
-            voiceData.data.status
-          );
+          fetchNui("talking", {
+            talkingState: voiceData.data.status
+          });
           break;
 
         case "Connected":

@@ -11,6 +11,7 @@ local Wait = Citizen.Wait;
 
 -- Game Natives
 local GetPlayerPed = GetPlayerPed;
+local PlayerPedId = PlayerPedId;
 local GetEntityCoords = GetEntityCoords;
 local GetPlayerServerId = GetPlayerServerId;
 local GetPlayerFromServerId = GetPlayerFromServerId;
@@ -26,6 +27,8 @@ local Config = nil;
 local UserName = '';
 local UserId = GetPlayerServerId(PlayerId());
 local loop = false;
+
+local Player = PlayerPedId();
 
 -- Register Events
 -- Player Events
@@ -104,6 +107,14 @@ RegisterNuiCallback('connected', function()
   end);
 end);
 
+RegisterNuiCallback('talking', function(data)
+  if data.talkingState then
+    PlayFacialAnim(Player, "mic_chatter", "mp_facial");
+  else
+    PlayFacialAnim(Player, "mood_normal_1", IsPedMale(Player) and "facials@gen_male@variations@normal" or "facials@gen_female@variations@normal");
+  end
+end);
+
 RegisterNuiCallback('disconnected', function()
   loop = false;
 end);
@@ -112,7 +123,6 @@ end);
 function OnVoiceTick()
   -- define player position, ped, etc
   -- used to compare distance, etc
-  local Player = PlayerPedId();
   local PlayerPos = GetEntityCoords(Player);
   local Rotation = GetGameplayCamRot(2).z;
 
