@@ -86,13 +86,6 @@ AddEventHandler('voice:PlayerLoaded', function(Data)
   });
 end);
 
---[[
-Ardi mach hier den Code einfach sauberer sowie in onVoiceTick bitte
-LG
-Dein
-SMJ 1337 - wake up...
-]]
-
 RegisterNUICallback('Connected', function(_, resp)
   loop = true;
 
@@ -194,7 +187,7 @@ function OnVoiceTick()
               y = y,
               z = 0,
               distance = Distance,
-              volumeRange = TargetVoiceRange,
+              voiceRange = TargetVoiceRange,
               volumeModifier = VolumeModifier
             });
           else
@@ -213,7 +206,7 @@ function OnVoiceTick()
                   y = 0,
                   z = 0,
                   distance = 0,
-                  volumeRange = 5,
+                  voiceRange = 5,
                   volumeModifier = 3
                 });
             end
@@ -222,6 +215,18 @@ function OnVoiceTick()
       end
     end
   end
+
+  SendNUIMessage({
+    action = 'send',
+    data = {
+      method = 'setLocalPosition',
+      data = {
+        x = PlayerPos.x,
+        y = PlayerPos.y,
+        z = PlayerPos.z
+      }
+    }
+  });
 
   SendNUIMessage({
     action = 'send',
