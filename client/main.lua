@@ -82,7 +82,7 @@ AddEventHandler('voice:PlayerLoaded', function(Data)
     debug = true,
     channelName = Config.ChannelName,
     channelPassword = Config.ChannelPassword,
-    username = UserName
+    username = tostring(UserName)
   });
 end);
 
@@ -182,7 +182,7 @@ function OnVoiceTick()
 
             -- insert it to the PlayerNames table, which we created before
             table_insert(PlayerNames, {
-              name = PoolData.name,
+              name = tostring(PoolData.name),
               x = x,
               y = y,
               z = 0,
@@ -201,7 +201,7 @@ function OnVoiceTick()
               -- if so then insert him to the PlayerNames table
               table_insert(PlayerNames,
                 {
-                  name = PoolData.name,
+                  name = tostring(PoolData.name),
                   x = 10,
                   y = 0,
                   z = 0,
