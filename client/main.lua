@@ -5,10 +5,6 @@ voice = {
   PlayerPool = {},
 };
 
--- Citizen Natives
-local CreateThread = Citizen.CreateThread;
-local Wait = Citizen.Wait;
-
 -- Game Natives
 local GetPlayerPed = GetPlayerPed;
 local PlayerPedId = PlayerPedId;
@@ -99,10 +95,6 @@ RegisterNUICallback('Connected', function(_, resp)
 end);
 
 RegisterNUICallback('Talking', function(data, resp)
-  if (data.username ~= UserName) then
-    return;
-  end
-
   -- TODO: change this to player data
   local ped = PlayerPedId();
 
