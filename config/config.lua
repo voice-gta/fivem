@@ -3,7 +3,7 @@ Config = {
   ChannelPassword = '123',
   UserPrefix = '00',
   Ranges = {
-    1.0,
+    3.5,
     8.0,
     15.0
   },

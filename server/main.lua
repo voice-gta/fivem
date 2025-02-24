@@ -51,13 +51,12 @@ local function toggleVoiceRange(player)
     -- check if the loop found the matching one
     if voice.PlayerPool[index].range == range then
       local Index = _ + 1;
-      local newRange = Config.Ranges[_ + 1];
 
-      -- if the higher voice range doesn't exist than go back to the first
-      if not Config.Ranges[_ + 1] then
-        newRange = 1;
+      if not Config.Ranges[Index] then
         Index = 1;
       end
+
+      local newRange = Config.Ranges[Index];
 
       -- update the pool data for the specified player
       voice.PlayerPool[index].range = newRange;

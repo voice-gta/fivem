@@ -95,6 +95,7 @@
       switch (voiceData.method) {
         case 'talking':
           fetchNui('Talking', {
+            username: voiceData
             state: voiceData.data.status
           });
           break;
@@ -139,6 +140,7 @@
     switch (event.data.action) {
       case 'send': {
         if (socket && socket.readyState === WebSocket.OPEN) {
+          console.debug(JSON.stringify(event.data.data));
           return socket.send(JSON.stringify(event.data.data));
         }
 

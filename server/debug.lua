@@ -2,7 +2,6 @@ local convar = GetConvar('voice_debug', 'no');
 
 if convar == '\'yes\'' or convar == 'yes' then
   RegisterCommand('debug', function(s, args)
-    local index = GetTableIndexBySource(s);
     local action = args[1];
     local value = args[2];
     local value2 = args[3];

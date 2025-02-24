@@ -99,6 +99,10 @@ RegisterNUICallback('Connected', function(_, resp)
 end);
 
 RegisterNUICallback('Talking', function(data, resp)
+  if (data.username ~= UserName) then
+    return;
+  end
+
   -- TODO: change this to player data
   local ped = PlayerPedId();
 
@@ -162,10 +166,9 @@ function OnVoiceTick()
 
             -- if the distance is greater or equals 5 then modify the volume to be quieter
             if Distance >= 5 then
-              VolumeModifier = (Distance * 35 / 10);
+              VolumeModifier = (Distance * -5 / 10);
             end
 
-            -- if the volume somehow exceeds 0, reset it to 0
             if VolumeModifier > 0 then
               VolumeModifier = 0;
             end
@@ -182,7 +185,7 @@ function OnVoiceTick()
 
             -- insert it to the PlayerNames table, which we created before
             table_insert(PlayerNames, {
-              name = tostring(PoolData.name),
+              name = PoolData.name,
               x = x,
               y = y,
               z = 0,
@@ -201,7 +204,7 @@ function OnVoiceTick()
               -- if so then insert him to the PlayerNames table
               table_insert(PlayerNames,
                 {
-                  name = tostring(PoolData.name),
+                  name = PoolData.name,
                   x = 10,
                   y = 0,
                   z = 0,
