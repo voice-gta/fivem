@@ -53,7 +53,7 @@
    * @param {string} channelPassword - The channel password
    * @param {string} username - The username
    */
-  function connectWebSocket(channelName, channelPassword, username) {
+  function connectWebSocket(channelName, channelPassword, username, swissChannels) {
     socket = new WebSocket('ws://localhost:3005');
 
     socket.onopen = () => {
@@ -66,6 +66,7 @@
             channel: channelName,
             password: channelPassword,
             username: username,
+            swisschannels: JSON.parse(swissChannels),
           },
         })
       );
@@ -82,7 +83,7 @@
 
         case 1005:
         case 1006:
-          reconnectWebSocket(channelName, channelPassword, username);
+          reconnectWebSocket(channelName, channelPassword, username, swissChannels);
           break;
       }
     };
@@ -107,6 +108,7 @@
                 channel: channelName,
                 password: channelPassword,
                 username: username,
+                swisschannels: JSON.parse(swissChannels),
               },
             })
           );
@@ -128,10 +130,10 @@
    * @param {string} channelPassword - The channel password
    * @param {string} username - The username
    */
-  function reconnectWebSocket(channelName, channelPassword, username) {
+  function reconnectWebSocket(channelName, channelPassword, username, swissChannels) {
     console.debug('Reconnecting...');
 
-    setTimeout(connectWebSocket.bind(null, channelName, channelPassword, username), 2000);
+    setTimeout(connectWebSocket.bind(null, channelName, channelPassword, username, swissChannels), 2000);
   }
 
   // add an event listener, to listen to NUI Events
@@ -153,7 +155,8 @@
         connectWebSocket(
           event.data.channelName,
           event.data.channelPassword,
-          event.data.username
+          event.data.username,
+          event.data.swissChannels,
         );
         break;
       }
