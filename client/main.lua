@@ -78,7 +78,8 @@ AddEventHandler('voice:PlayerLoaded', function(Data)
     debug = true,
     channelName = Config.ChannelName,
     channelPassword = Config.ChannelPassword,
-    username = tostring(UserName)
+    username = tostring(UserName),
+    swissChannels = json.encode({channels = Config.SwissChannels})
   });
 end);
 

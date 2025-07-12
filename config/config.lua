@@ -10,5 +10,10 @@ Config = {
   KeyMapper = {
     ToggleVoiceRange = 'Y',
     ToggleRadio = 'CAPSLOCK',
+  },
+  SwissChannels = {
+    {
+      Name = 'Channel 1',
+    }
   }
 };
