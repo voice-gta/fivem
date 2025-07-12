@@ -186,6 +186,7 @@ function OnVoiceTick()
             local SubPos = {
               X = TargetPos.x - PlayerPos.x,
               Y = TargetPos.y - PlayerPos.y,
+              Z = TargetPos.z - PlayerPos.z,
             };
 
             -- do some math sh*t to define where the audio is coming from, etc
@@ -197,7 +198,7 @@ function OnVoiceTick()
               name = PoolData.name,
               x = x,
               y = y,
-              z = 0,
+              z = SubPos.Z,
               distance = Distance,
               voiceRange = TargetVoiceRange,
               volumeModifier = VolumeModifier
