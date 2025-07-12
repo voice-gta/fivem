@@ -11,27 +11,43 @@ local PlayerPedId = PlayerPedId;
 local GetEntityCoords = GetEntityCoords;
 local GetPlayerServerId = GetPlayerServerId;
 local GetPlayerFromServerId = GetPlayerFromServerId;
+local GetGameplayCamRot = GetGameplayCamRot;
+local AddEventHandler = AddEventHandler;
+local RegisterNetEvent = RegisterNetEvent;
+local RegisterCommand = RegisterCommand;
+local TriggerServerEvent = TriggerServerEvent;
+local RegisterKeyMapping = RegisterKeyMapping;
+local SendNUIMessage = SendNUIMessage;
+local RegisterNUICallback = RegisterNUICallback;
+local PlayerId = PlayerId;
+local PlayFacialAnim = PlayFacialAnim;
+local IsPedMale = IsPedMale;
+local SetPlayerTalkingOverride = SetPlayerTalkingOverride;
+local NetworkIsPlayerActive = NetworkIsPlayerActive;
+local DoesEntityExist = DoesEntityExist;
 
 -- Lua Globals
 local math_cos = math.cos;
 local math_sin = math.sin;
 local table_insert = table.insert;
 local pairs = pairs;
+local tostring = tostring;
 
 -- Variables
 local Config = nil;
 local UserName = '';
 local UserId = GetPlayerServerId(PlayerId());
 local loop = false;
-
 local Player = PlayerPedId();
 
 -- Register Events
+
 -- Player Events
 RegisterNetEvent('voice:VoiceRangeChanged');
 RegisterNetEvent('voice:RadioChannelChanged');
 RegisterNetEvent('voice:CallChanged');
 RegisterNetEvent('voice:PlayerLoaded');
+
 -- Global Events
 RegisterNetEvent('voice:PlayerPoolChanged');
 RegisterNetEvent('voice:RadioPoolChanged');

@@ -9,7 +9,7 @@ Config = {
   },
   KeyMapper = {
     ToggleVoiceRange = 'Y',
-    ToggleRadio = 'CAPSLOCK',
+    ToggleRadio = 'CAPS',
   },
   SwissChannels = {
     {

@@ -7,6 +7,9 @@ voice = {
 
 -- Game Natives
 local DropPlayer = DropPlayer;
+local RegisterNetEvent = RegisterNetEvent;
+local TriggerClientEvent = TriggerClientEvent;
+local AddEventHandler = AddEventHandler;
 
 -- Lua Globals
 local type = type;
