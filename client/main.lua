@@ -29,6 +29,7 @@ local DoesEntityExist = DoesEntityExist;
 -- Lua Globals
 local math_cos = math.cos;
 local math_sin = math.sin;
+local math_pi = math.pi;
 local table_insert = table.insert;
 local pairs = pairs;
 local tostring = tostring;
@@ -143,7 +144,7 @@ function OnVoiceTick()
   -- define player position, ped, etc
   -- used to compare distance, etc
   local PlayerPos = GetEntityCoords(Player);
-  local Rotation = GetGameplayCamRot(2).z;
+  local Rotation = math_pi / 180 * (GetGameplayCamRot(2).z * -1);
 
   -- init the PlayerNames table, were all voice clients get stored
   local PlayerNames = {};
@@ -185,8 +186,7 @@ function OnVoiceTick()
             -- define a table including the distance on x and y from the current client to the current player
             local SubPos = {
               X = TargetPos.x - PlayerPos.x,
-              Y = TargetPos.y - PlayerPos.y,
-              Z = TargetPos.z - PlayerPos.z,
+              Y = TargetPos.y - PlayerPos.y
             };
 
             -- do some math sh*t to define where the audio is coming from, etc
@@ -198,7 +198,7 @@ function OnVoiceTick()
               name = PoolData.name,
               x = x,
               y = y,
-              z = SubPos.Z,
+              z = 0,
               distance = Distance,
               voiceRange = TargetVoiceRange,
               volumeModifier = VolumeModifier
