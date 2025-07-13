@@ -59,6 +59,8 @@
     socket.onopen = () => {
       console.debug('WebSocket Connected');
 
+      console.log(channelName, channelPassword, username, swissChannels);
+
       socket.send(
         JSON.stringify({
           method: 'joinChannel',
@@ -133,7 +135,7 @@
   function reconnectWebSocket(channelName, channelPassword, username, swissChannels) {
     console.debug('Reconnecting...');
 
-    setTimeout(connectWebSocket.bind(null, channelName, channelPassword, username, swissChannels), 2000);
+    setTimeout(connectWebSocket.bind(null, channelName, channelPassword, username, swissChannels), 30000);
   }
 
   // add an event listener, to listen to NUI Events

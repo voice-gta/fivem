@@ -1,5 +1,5 @@
 Config = {
-  ChannelName = 'Ingame',
+  ChannelName = 'Voice',
   ChannelPassword = '123',
   UserPrefix = '00',
   Ranges = {
@@ -13,7 +13,7 @@ Config = {
   },
   SwissChannels = {
     {
-      Name = 'Channel 1',
+      name = 'Channel 1',
     }
   }
 };

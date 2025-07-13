@@ -3,7 +3,6 @@ games { 'rdr3', 'gta5' }
 lua54 'yes'
 
 author 'SMJ-1337 & ardelan869'
-description 'still thinking...'
 version '1.0'
 
 ui_page 'socket.html'
