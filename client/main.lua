@@ -106,7 +106,7 @@ RegisterNUICallback('Connected', function(_, resp)
   while loop do
     -- trigger main voice function
     OnVoiceTick();
-    Citizen.Wait(1000);
+    Citizen.Wait(500);
   end
 
   resp('OK');
@@ -196,12 +196,12 @@ function OnVoiceTick()
             -- insert it to the PlayerNames table, which we created before
             table_insert(PlayerNames, {
               name = PoolData.name,
-              x = x,
-              y = y,
-              z = 0,
-              distance = Distance,
-              voiceRange = TargetVoiceRange,
-              volumeModifier = VolumeModifier
+              x = x + 0.0,
+              y = y + 0.0,
+              z = 0.0,
+              distance = Distance + 0.0,
+              voiceRange = TargetVoiceRange + 0.0,
+              volumeModifier = VolumeModifier + 0.0
             });
           else
             -- if the player isn't anywhere near us, or we aren't able to hear him,
@@ -215,12 +215,12 @@ function OnVoiceTick()
               table_insert(PlayerNames,
                 {
                   name = PoolData.name,
-                  x = 10,
-                  y = 0,
-                  z = 0,
-                  distance = 0,
-                  voiceRange = 5,
-                  volumeModifier = 3
+                  x = 10.0,
+                  y = 0.0,
+                  z = 0.0,
+                  distance = 0.0,
+                  voiceRange = 5.0,
+                  volumeModifier = 3.0
                 });
             end
           end
@@ -234,9 +234,9 @@ function OnVoiceTick()
     data = {
       method = 'setLocalPosition',
       data = {
-        x = PlayerPos.x,
-        y = PlayerPos.y,
-        z = PlayerPos.z
+        x = PlayerPos.x + 0.0,
+        y = PlayerPos.y + 0.0,
+        z = PlayerPos.z + 0.0
       }
     }
   });

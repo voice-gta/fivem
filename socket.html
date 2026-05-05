@@ -1,15 +1,17 @@
 <script>
-  if (!('WebSocket' in window)) {
-    throw new Error('Websockets are not supported');
+  if (!("WebSocket" in window)) {
+    throw new Error("Websockets are not supported");
   }
 
-  const RESOURCE_NAME = 'GetParentResourceName' in window ? GetParentResourceName() : 'voice';
+  const RESOURCE_NAME =
+    "GetParentResourceName" in window ? GetParentResourceName() : "voice";
   const HEADERS = {
-    'Content-Type': 'application/json; charset=UTF-8',
+    "Content-Type": "application/json; charset=UTF-8",
   };
   const BASE_URL = `https://${RESOURCE_NAME}`;
 
-  let socket, debug = false;
+  let socket,
+    debug = false;
 
   /**
    * Log a message to the console
@@ -18,7 +20,7 @@
   console.debug = function (...args) {
     if (!debug) return;
 
-    console.log('^6[Voice]:', ...args, '^0');
+    console.log("^6[Voice]:", ...args, "^0");
   };
 
   /**
@@ -28,10 +30,10 @@
    * @returns {Promise<any>} The response from the NUI message
    */
   async function fetchNui(url, data) {
-    console.debug('fetchNui', url, data);
+    console.debug("fetchNui", url, data);
 
     const resp = await fetch(`${BASE_URL}/${url}`, {
-      method: 'POST',
+      method: "POST",
       headers: HEADERS,
       body: JSON.stringify(data),
     });
@@ -53,17 +55,22 @@
    * @param {string} channelPassword - The channel password
    * @param {string} username - The username
    */
-  function connectWebSocket(channelName, channelPassword, username, swissChannels) {
-    socket = new WebSocket('ws://localhost:3005');
+  function connectWebSocket(
+    channelName,
+    channelPassword,
+    username,
+    swissChannels
+  ) {
+    socket = new WebSocket("ws://localhost:3005");
 
     socket.onopen = () => {
-      console.debug('WebSocket Connected');
+      console.debug("WebSocket Connected");
 
       console.log(channelName, channelPassword, username, swissChannels);
 
       socket.send(
         JSON.stringify({
-          method: 'joinChannel',
+          method: "joinChannel",
           data: {
             channel: channelName,
             password: channelPassword,
@@ -73,39 +80,44 @@
         })
       );
 
-      fetchNui('Connected');
+      fetchNui("Connected");
     };
 
     socket.onclose = (event) => {
-      console.debug('WebSocket Disconnected, Code:', event.code);
+      console.debug("WebSocket Disconnected, Code:", event.code);
 
       switch (event.code) {
         case 1000:
-          fetchNui('Disconnected');
+          fetchNui("Disconnected");
 
         case 1005:
         case 1006:
-          reconnectWebSocket(channelName, channelPassword, username, swissChannels);
+          reconnectWebSocket(
+            channelName,
+            channelPassword,
+            username,
+            swissChannels
+          );
           break;
       }
     };
 
     socket.onmessage = (event) => {
-      console.debug('WebSocket Message:', event.data);
+      console.debug("WebSocket Message:", event.data);
 
       const voiceData = ({ data, method } = JSON.parse(event.data));
 
       switch (voiceData.method) {
-        case 'talking':
-          fetchNui('Talking', {
-            state: voiceData.data.status
+        case "talking":
+          fetchNui("Talking", {
+            state: voiceData.data.status,
           });
           break;
 
-        case 'connected': // Connected to the server
+        case "connected": // Connected to the server
           socket.send(
             JSON.stringify({
-              method: 'joinChannel',
+              method: "joinChannel",
               data: {
                 channel: channelName,
                 password: channelPassword,
@@ -116,13 +128,14 @@
           );
           break;
 
-        // case 'success': //Successfully joined the voice channel
-        //   break;
+        case "success": //Successfully joined the voice channel
+          fetchNui("Success", {});
+          break;
       }
     };
 
     socket.onerror = (error) => {
-      console.debug('WebSocket Error:', error);
+      console.debug("WebSocket Error:", error);
     };
   }
 
@@ -132,33 +145,47 @@
    * @param {string} channelPassword - The channel password
    * @param {string} username - The username
    */
-  function reconnectWebSocket(channelName, channelPassword, username, swissChannels) {
-    console.debug('Reconnecting...');
+  function reconnectWebSocket(
+    channelName,
+    channelPassword,
+    username,
+    swissChannels
+  ) {
+    console.debug("Reconnecting...");
 
-    setTimeout(connectWebSocket.bind(null, channelName, channelPassword, username, swissChannels), 30000);
+    setTimeout(
+      connectWebSocket.bind(
+        null,
+        channelName,
+        channelPassword,
+        username,
+        swissChannels
+      ),
+      30000
+    );
   }
 
   // add an event listener, to listen to NUI Events
-  window.addEventListener('message', function (event) {
+  window.addEventListener("message", function (event) {
     switch (event.data.action) {
-      case 'send': {
+      case "send": {
         if (socket && socket.readyState === WebSocket.OPEN) {
           console.debug(JSON.stringify(event.data.data));
           return socket.send(JSON.stringify(event.data.data));
         }
 
-        console.debug('Socket is not connected');
+        console.debug("Socket is not connected");
         break;
       }
 
-      case 'init': {
+      case "init": {
         debug = !!event.data.debug;
 
         connectWebSocket(
           event.data.channelName,
           event.data.channelPassword,
           event.data.username,
-          event.data.swissChannels,
+          event.data.swissChannels
         );
         break;
       }
