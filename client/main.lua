@@ -37,6 +37,7 @@ local tostring = tostring;
 -- Variables
 local Config = nil;
 local UserName = '';
+local UserPlayerId = PlayerId();
 local UserId = GetPlayerServerId(PlayerId());
 local loop = false;
 local Player = PlayerPedId();
@@ -92,11 +93,11 @@ AddEventHandler('voice:PlayerLoaded', function(Data)
   -- initiate the main thread
   SendNUIMessage({
     action = 'init',
-    debug = true,
+    debug = false,
     channelName = Config.ChannelName,
     channelPassword = Config.ChannelPassword,
     username = tostring(UserName),
-    swissChannels = json.encode({channels = Config.SwissChannels})
+    swissChannels = json.encode({ channels = Config.SwissChannels })
   });
 end);
 
@@ -104,9 +105,11 @@ RegisterNUICallback('Connected', function(_, resp)
   loop = true;
 
   while loop do
+    -- Update Values like PlayerPedId
+    UpdateValuesTick();
     -- trigger main voice function
     OnVoiceTick();
-    Citizen.Wait(500);
+    Citizen.Wait(1);
   end
 
   resp('OK');
@@ -140,6 +143,20 @@ RegisterNUICallback('Disconnected', function(_, resp)
 end);
 
 -- Functions
+function UpdateValuesTick()
+  if Player ~= PlayerPedId() then
+    Player = PlayerPedId();
+  end;
+
+  if UserPlayerId ~= PlayerId() then
+    UserPlayerId = PlayerId();
+  end;
+
+  if UserId ~= GetPlayerServerId(UserId) then
+    UserId = GetPlayerServerId(UserId);
+  end;
+end;
+
 function OnVoiceTick()
   -- define player position, ped, etc
   -- used to compare distance, etc
@@ -161,7 +178,6 @@ function OnVoiceTick()
       -- if the data exists and the player isn't muted then proceed
       if PoolData and not PoolData.muted then
         local TargetPed = GetPlayerPed(Target);
-
         -- check if the player is in my range/stream (what ever) and if he has a ped
         if NetworkIsPlayerActive(Target) and DoesEntityExist(TargetPed) then
           -- define player pos, distance and voice range
@@ -171,16 +187,15 @@ function OnVoiceTick()
 
           -- check if the player is hearable for the current client,
           -- by comparing my distance to him with his voice range
-          if Distance <= TargetVoiceRange then
-            local VolumeModifier = 0;
+          if (Distance <= TargetVoiceRange) then
+            local VolumeModifier = 1;
+            local percent = TargetVoiceRange / 100 * Distance;
+            VolumeModifier = VolumeModifier - percent;
 
-            -- if the distance is greater or equals 5 then modify the volume to be quieter
-            if Distance >= 5 then
-              VolumeModifier = (Distance * -5 / 10);
-            end
-
-            if VolumeModifier > 0 then
-              VolumeModifier = 0;
+            if (TargetVoiceRange == 15.0) then
+              VolumeModifier = VolumeModifier * 1.3;
+            elseif (TargetVoiceRange == 8.0) then
+              VolumeModifier = VolumeModifier * 0.9;
             end
 
             -- define a table including the distance on x and y from the current client to the current player
