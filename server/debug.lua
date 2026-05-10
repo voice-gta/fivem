@@ -4,7 +4,7 @@ if convar == '\'yes\'' or convar == 'yes' then
   RegisterCommand('debug', function(s, args)
     local action = args[1];
     local value = args[2];
-    local value2 = args[3];
+    local value2 = tonumber(args[3]);
 
     if action == 'radio' then
       if value == 'join' then
