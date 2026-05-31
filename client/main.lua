@@ -116,21 +116,18 @@ RegisterNUICallback('Connected', function(_, resp)
 end);
 
 RegisterNUICallback('Talking', function(data, resp)
-  -- TODO: change this to player data
-  local ped = PlayerPedId();
-
-  SetPlayerTalkingOverride(PlayerId(), data.state);
+  SetPlayerTalkingOverride(UserPlayerId, data.state);
 
   if data.state then
-    PlayFacialAnim(ped, 'mic_chatter', 'mp_facial');
+    PlayFacialAnim(Player, 'mic_chatter', 'mp_facial');
   else
     local animName = 'facials@gen_female@variations@normal';
 
-    if IsPedMale(ped) then
+    if IsPedMale(Player) then
       animName = 'facials@gen_male@variations@normal';
     end
 
-    PlayFacialAnim(ped, 'mood_normal_1', animName);
+    PlayFacialAnim(Player, 'mood_normal_1', animName);
   end
 
   resp('OK');
@@ -223,7 +220,7 @@ function OnVoiceTick()
             -- because our distance exceeds his voice range,
             -- then check if the client and the player are connected in a call and in the same call
             if
-                (PoolData.callId and PoolData.callId == MyPool.callId) or
+                (PoolData.callId and PoolData.callId == MyPool.callId and PoolData.callActive) or
                 (PoolData.radioId and PoolData.radioId == MyPool.radioId and PoolData.radioActive)
             then
               -- if so then insert him to the PlayerNames table

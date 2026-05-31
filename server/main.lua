@@ -35,6 +35,7 @@ RegisterNetEvent('voice:PlayerConnected', function()
     muted = false,
     name = Config.UserPrefix .. source,
     callId = nil,
+    callActive = false,
     radioId = nil,
     radioActive = false,
   })
