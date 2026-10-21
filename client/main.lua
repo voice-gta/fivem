@@ -25,6 +25,7 @@ local IsPedMale = IsPedMale;
 local SetPlayerTalkingOverride = SetPlayerTalkingOverride;
 local NetworkIsPlayerActive = NetworkIsPlayerActive;
 local DoesEntityExist = DoesEntityExist;
+local CreateThread = CreateThread;
 
 -- Lua Globals
 local math_cos = math.cos;
@@ -104,13 +105,15 @@ end);
 RegisterNUICallback('Connected', function(_, resp)
   loop = true;
 
-  while loop do
-    -- Update Values like PlayerPedId
-    UpdateValuesTick();
-    -- trigger main voice function
-    OnVoiceTick();
-    Citizen.Wait(1);
-  end
+  CreateThread(function()
+    while loop do
+      -- Update Values like PlayerPedId
+      UpdateValuesTick();
+      -- trigger main voice function
+      OnVoiceTick();
+      Citizen.Wait(500);
+    end
+  end)
 
   resp('OK');
 end);
