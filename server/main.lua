@@ -115,6 +115,24 @@ exports('MutePlayer', function(target, bool)
   TriggerClientEvent('voice:PlayerPoolChanged', -1, voice.PlayerPool);
 end)
 
+exports('changeRadioActiveForPlayer', function(target, bool)
+  local index = GetTableIndexBySource(target);
+
+  -- set the specified bool for the muted value
+  voice.PlayerPool[index].radioActive = bool;
+  -- send all clients the new player pool
+  TriggerClientEvent('voice:PlayerPoolChanged', -1, voice.PlayerPool);
+end)
+
+exports('changeCallActiveForPlayer', function(target, bool)
+  local index = GetTableIndexBySource(target);
+
+  -- set the specified bool for the muted value
+  voice.PlayerPool[index].callActive = bool;
+  -- send all clients the new player pool
+  TriggerClientEvent('voice:PlayerPoolChanged', -1, voice.PlayerPool);
+end)
+
 local function addPlayerToPool(target, id, poolData)
   -- turning the id and source to a string, to use as a table key
   local value = tostring(id);

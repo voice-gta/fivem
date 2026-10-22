@@ -26,6 +26,7 @@ local SetPlayerTalkingOverride = SetPlayerTalkingOverride;
 local NetworkIsPlayerActive = NetworkIsPlayerActive;
 local DoesEntityExist = DoesEntityExist;
 local CreateThread = CreateThread;
+local GetEntityForwardVector = GetEntityForwardVector;
 
 -- Lua Globals
 local math_cos = math.cos;
@@ -161,6 +162,7 @@ function OnVoiceTick()
   -- define player position, ped, etc
   -- used to compare distance, etc
   local PlayerPos = GetEntityCoords(Player);
+  local PlayerForwardVector = GetEntityForwardVector(Player);
   local Rotation = math_pi / 180 * (GetGameplayCamRot(2).z * -1);
 
   -- init the PlayerNames table, were all voice clients get stored
@@ -249,9 +251,12 @@ function OnVoiceTick()
     data = {
       method = 'setLocalPosition',
       data = {
-        x = PlayerPos.x + 0.0,
-        y = PlayerPos.y + 0.0,
-        z = PlayerPos.z + 0.0
+        PlayerPosX = PlayerPos.x + 0.0,
+        PlayerPosY = PlayerPos.y + 0.0,
+        PlayerPosZ = PlayerPos.z + 0.0,
+        PlayerForwardVectorX = PlayerForwardVector.x + 0.0,
+        PlayerForwardVectorY = PlayerForwardVector.y + 0.0,
+        PlayerForwardVectorZ = PlayerForwardVector.z + 0.0
       }
     }
   });
