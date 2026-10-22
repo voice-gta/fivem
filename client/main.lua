@@ -26,12 +26,11 @@ local SetPlayerTalkingOverride = SetPlayerTalkingOverride;
 local NetworkIsPlayerActive = NetworkIsPlayerActive;
 local DoesEntityExist = DoesEntityExist;
 local CreateThread = CreateThread;
-local GetEntityForwardVector = GetEntityForwardVector;
 
 -- Lua Globals
 local math_cos = math.cos;
 local math_sin = math.sin;
-local math_pi = math.pi;
+local math_rad = math.rad;
 local table_insert = table.insert;
 local pairs = pairs;
 local tostring = tostring;
@@ -162,8 +161,8 @@ function OnVoiceTick()
   -- define player position, ped, etc
   -- used to compare distance, etc
   local PlayerPos = GetEntityCoords(Player);
-  local PlayerForwardVector = GetEntityForwardVector(Player);
-  local Rotation = math_pi / 180 * (GetGameplayCamRot(2).z * -1);
+  local camZ = math_rad(GetGameplayCamRot(2).z);
+  local fwdX, fwdY = -math_sin(camZ), math_cos(camZ)
 
   -- init the PlayerNames table, were all voice clients get stored
   local PlayerNames = {};
@@ -190,32 +189,14 @@ function OnVoiceTick()
           -- check if the player is hearable for the current client,
           -- by comparing my distance to him with his voice range
           if (Distance <= TargetVoiceRange) then
-            local VolumeModifier = 1;
-            local percent = TargetVoiceRange / 100 * Distance;
-            VolumeModifier = VolumeModifier - percent;
-
-            if (TargetVoiceRange == 15.0) then
-              VolumeModifier = VolumeModifier * 1.3;
-            elseif (TargetVoiceRange == 8.0) then
-              VolumeModifier = VolumeModifier * 0.9;
-            end
-
-            -- define a table including the distance on x and y from the current client to the current player
-            local SubPos = {
-              X = TargetPos.x - PlayerPos.x,
-              Y = TargetPos.y - PlayerPos.y
-            };
-
-            -- do some math sh*t to define where the audio is coming from, etc
-            local x = SubPos.X * math_cos(Rotation) - SubPos.Y * math_sin(Rotation) * 10 / TargetVoiceRange;
-            local y = SubPos.X * math_cos(Rotation) + SubPos.Y * math_sin(Rotation) * 10 / TargetVoiceRange;
+            local VolumeModifier = 1.0 - (Distance / TargetVoiceRange);
 
             -- insert it to the PlayerNames table, which we created before
             table_insert(PlayerNames, {
               name = PoolData.name,
-              x = x + 0.0,
-              y = y + 0.0,
-              z = 0.0,
+              x = TargetPos.x + 0.0,
+              y = TargetPos.y + 0.0,
+              z = TargetPos.z + 0.0,
               distance = Distance + 0.0,
               voiceRange = TargetVoiceRange + 0.0,
               volumeModifier = VolumeModifier + 0.0
@@ -232,12 +213,12 @@ function OnVoiceTick()
               table_insert(PlayerNames,
                 {
                   name = PoolData.name,
-                  x = 10.0,
-                  y = 0.0,
-                  z = 0.0,
+                  x = PlayerPos.x + 0.0,
+                  y = PlayerPos.y + 0.0,
+                  z = PlayerPos.z + 0.0,
                   distance = 0.0,
-                  voiceRange = 5.0,
-                  volumeModifier = 3.0
+                  voiceRange = 1.0,
+                  volumeModifier = 1.0
                 });
             end
           end
@@ -254,9 +235,9 @@ function OnVoiceTick()
         PlayerPosX = PlayerPos.x + 0.0,
         PlayerPosY = PlayerPos.y + 0.0,
         PlayerPosZ = PlayerPos.z + 0.0,
-        PlayerForwardVectorX = PlayerForwardVector.x + 0.0,
-        PlayerForwardVectorY = PlayerForwardVector.y + 0.0,
-        PlayerForwardVectorZ = PlayerForwardVector.z + 0.0
+        PlayerForwardVectorX = fwdX + 0.0,
+        PlayerForwardVectorY = fwdY + 0.0,
+        PlayerForwardVectorZ = 0.0
       }
     }
   });
