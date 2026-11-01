@@ -59,7 +59,7 @@
     channelName,
     channelPassword,
     username,
-    swissChannels
+    swissChannels,
   ) {
     socket = new WebSocket("ws://localhost:3005");
 
@@ -77,7 +77,7 @@
             username: username,
             swisschannels: JSON.parse(swissChannels),
           },
-        })
+        }),
       );
 
       fetchNui("Connected");
@@ -96,7 +96,7 @@
             channelName,
             channelPassword,
             username,
-            swissChannels
+            swissChannels,
           );
           break;
       }
@@ -124,7 +124,7 @@
                 username: username,
                 swisschannels: JSON.parse(swissChannels),
               },
-            })
+            }),
           );
           break;
 
@@ -149,7 +149,7 @@
     channelName,
     channelPassword,
     username,
-    swissChannels
+    swissChannels,
   ) {
     console.debug("Reconnecting...");
 
@@ -159,11 +159,21 @@
         channelName,
         channelPassword,
         username,
-        swissChannels
+        swissChannels,
       ),
-      50000
+      50000,
     );
   }
+
+  function cleanUp() {
+    try {
+      if (socket && socket.readyState === WebSocket.OPEN)
+        socket.close(1000, "Spiel verlassen");
+    } catch (e) {}
+  }
+
+  window.addEventListener("pagehide", cleanUp);
+  window.addEventListener("beforeunload", cleanUp);
 
   // add an event listener, to listen to NUI Events
   window.addEventListener("message", function (event) {
@@ -185,7 +195,7 @@
           event.data.channelName,
           event.data.channelPassword,
           event.data.username,
-          event.data.swissChannels
+          event.data.swissChannels,
         );
         break;
       }
